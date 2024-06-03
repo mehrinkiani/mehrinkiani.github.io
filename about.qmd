@@ -6,13 +6,13 @@ about:
   links:
     - icon: twitter
       text: Twitter
-      href: https://twitter.com
+      href: https://x.com/KianiMehrin
     - icon: linkedin
       text: LinkedIn
-      href: https://linkedin.com
+      href: https://www.linkedin.com/in/mehrin-kiani-phd-713705233/
     - icon: github
       text: Github
-      href: https://github.com
+      href: https://github.com/mehrinkiani
 
 ---
 
