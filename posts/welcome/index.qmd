@@ -1,9 +1,0 @@
----
-title: "Welcome To My Blog"
-author: "Mehrin Kiani"
-date: "2024-06-03"
-categories: [blog]
----
-
-This is the first post in a Quarto blog. Welcome!
-
