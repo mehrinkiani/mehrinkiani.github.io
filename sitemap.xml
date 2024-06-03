@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mehrinkiani.github.io/posts/welcome/index.html</loc>
-    <lastmod>2024-06-03T18:36:34.435Z</lastmod>
-  </url>
-  <url>
     <loc>https://mehrinkiani.github.io/index.html</loc>
-    <lastmod>2024-06-03T18:36:34.435Z</lastmod>
+    <lastmod>2024-06-03T18:49:39.099Z</lastmod>
   </url>
   <url>
     <loc>https://mehrinkiani.github.io/about.html</loc>
-    <lastmod>2024-06-03T18:36:34.435Z</lastmod>
+    <lastmod>2024-06-03T18:49:39.099Z</lastmod>
   </url>
   <url>
     <loc>https://mehrinkiani.github.io/posts/post-with-code/index.html</loc>
-    <lastmod>2024-06-03T18:36:34.435Z</lastmod>
+    <lastmod>2024-06-03T18:49:39.099Z</lastmod>
   </url>
 </urlset>
