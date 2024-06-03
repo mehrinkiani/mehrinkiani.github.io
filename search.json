@@ -1,10 +1,24 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Machine Learning Blog",
+    "objectID": "posts/01_welcome_blog/index.html",
+    "href": "posts/01_welcome_blog/index.html",
+    "title": "Welcome!",
     "section": "",
-    "text": "Welcome!\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nJun 3, 2024\n\n\nHarlow Malloc\n\n\n\n\n\n\nNo matching items"
+    "text": "Hello! and welcome to my Machine Learning (ML) blog!\nI plan using my blog to share what I learn. At the moment, I am attending the course turned conference on Mastering LLMs: A Conference For Developers & Data Scientists and short term plan is to post about what I learn at the conference."
+  },
+  {
+    "objectID": "posts/01_welcome_blog/index.html#work-experience",
+    "href": "posts/01_welcome_blog/index.html#work-experience",
+    "title": "Welcome!",
+    "section": "Work Experience",
+    "text": "Work Experience\nI work as a Machine Learning Scientist. Part of my reserch work focussed on ModelScan: It is an OSS project that scans Machine Learning (ML) models to determine if they contain unsafe code, i.e. scans for Model Serialization Attack (MSA). - Build a proof of concept for model serialization attacks for the aforementioned ML libraries - Wrote Jupyter Notebooks to demonstrate MSA on Tensorflow, Keras, PyTorch, XGBoost models. - Develop ModelScan to detect model serialization attacks without loading the model for the aforementioned ML frameworks"
+  },
+  {
+    "objectID": "posts/01_welcome_blog/index.html#educational-background",
+    "href": "posts/01_welcome_blog/index.html#educational-background",
+    "title": "Welcome!",
+    "section": "Educational Background",
+    "text": "Educational Background\nI have a PhD in Computer Science from University of Essex, England. My research work focussed on developing novel ML algorithms to inform our understanding of developmental cognitive neuroscience. More details of my research can be found on my Google Scholar"
   },
   {
     "objectID": "about.html",
@@ -14,10 +28,10 @@
     "text": "About this blog"
   },
   {
-    "objectID": "posts/post-with-code/index.html",
-    "href": "posts/post-with-code/index.html",
-    "title": "Post With Code",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Machine Learning Blog",
     "section": "",
-    "text": "This is a post with executable code."
+    "text": "Welcome!\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   }
 ]
