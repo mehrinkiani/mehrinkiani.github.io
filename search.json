@@ -4,14 +4,28 @@
     "href": "posts/first-post.html",
     "title": "Welcome To My Blog",
     "section": "",
-    "text": "Welcome to my blog! This is my first post."
+    "text": "First post!"
   },
   {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this blog"
+    "text": "Hello! and welcome to my Machine Learning (ML) blog!\nI plan using my blog to share what I learn."
+  },
+  {
+    "objectID": "about.html#work-experience",
+    "href": "about.html#work-experience",
+    "title": "About",
+    "section": "Work Experience",
+    "text": "Work Experience\nI work as a Machine Learning Scientist. Part of my reserch work focussed on ModelScan: It is an OSS project that scans Machine Learning (ML) models to determine if they contain unsafe code, i.e. scans for Model Serialization Attack (MSA).\n\nBuild a proof of concept for model serialization attacks for the aforementioned ML libraries\nWrote Jupyter Notebooks to demonstrate MSA on Tensorflow, Keras, PyTorch, XGBoost models.\nDevelop ModelScan to detect model serialization attacks without loading the model for the aforementioned ML frameworks"
+  },
+  {
+    "objectID": "about.html#educational-background",
+    "href": "about.html#educational-background",
+    "title": "About",
+    "section": "Educational Background",
+    "text": "Educational Background\nI have a PhD in Computer Science from University of Essex, England. My research work focussed on developing novel ML algorithms to inform our understanding of developmental cognitive neuroscience. More details of my research can be found on my Google Scholar"
   },
   {
     "objectID": "index.html",
