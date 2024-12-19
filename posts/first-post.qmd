@@ -4,4 +4,4 @@ date: "2024-12-19"
 categories: [news]
 ---
 
-Welcome to my blog! This is my first post.
+First post! 
