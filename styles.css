@@ -1,1 +1,9 @@
 /* css styles */
+ul{
+    text-align: left !important;
+}
+
+/* Make sure paragraphs are left-aligned */
+p {
+    text-align: left !important;
+}
