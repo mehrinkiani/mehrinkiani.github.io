@@ -3,7 +3,7 @@ project:
   output-dir: _site
 
 website:
-  title: "Mehrin Kiani"
+  title: "Mehrin Kiani's Blog"
   navbar:
     right:
       - about.qmd
