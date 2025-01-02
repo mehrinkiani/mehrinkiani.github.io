@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mehrin Kiani">
+<meta name="dcterms.date" content="2024-12-20">
+
+<title>LLM Evaluations using Inspect – Mehrin Kiani’s Blog</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-659650fc26dc25888fc1474f317bb8ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="mermaid-theme" content="neutral">
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mehrin Kiani’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/mehrinkiani"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://x.com/KianiMehrin"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#why-do-we-need-llm-evaluations" id="toc-why-do-we-need-llm-evaluations" class="nav-link" data-scroll-target="#why-do-we-need-llm-evaluations">Why do we need LLM Evaluations?</a></li>
+  <li><a href="#llm-evaluations" id="toc-llm-evaluations" class="nav-link" data-scroll-target="#llm-evaluations">LLM Evaluations</a>
+  <ul class="collapse">
+  <li><a href="#unit-evaluations" id="toc-unit-evaluations" class="nav-link" data-scroll-target="#unit-evaluations">Unit Evaluations</a></li>
+  <li><a href="#llm-as-a-judge" id="toc-llm-as-a-judge" class="nav-link" data-scroll-target="#llm-as-a-judge">LLM as a Judge</a></li>
+  <li><a href="#human-evaluation" id="toc-human-evaluation" class="nav-link" data-scroll-target="#human-evaluation">Human Evaluation</a></li>
+  </ul></li>
+  <li><a href="#inspect" id="toc-inspect" class="nav-link" data-scroll-target="#inspect">Inspect</a>
+  <ul class="collapse">
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a></li>
+  <li><a href="#solver" id="toc-solver" class="nav-link" data-scroll-target="#solver">Solver</a></li>
+  <li><a href="#scorer" id="toc-scorer" class="nav-link" data-scroll-target="#scorer">Scorer</a></li>
+  <li><a href="#logs" id="toc-logs" class="nav-link" data-scroll-target="#logs">Logs</a></li>
+  </ul></li>
+  <li><a href="#sec-example" id="toc-sec-example" class="nav-link" data-scroll-target="#sec-example">Example: Evaluating LLM Responses on Symptom to Disease Diagnosis</a>
+  <ul class="collapse">
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a></li>
+  <li><a href="#model-responses" id="toc-model-responses" class="nav-link" data-scroll-target="#model-responses">Model Responses</a></li>
+  <li><a href="#unit-evaluations-1" id="toc-unit-evaluations-1" class="nav-link" data-scroll-target="#unit-evaluations-1">Unit Evaluations</a></li>
+  <li><a href="#llm-as-a-judge-1" id="toc-llm-as-a-judge-1" class="nav-link" data-scroll-target="#llm-as-a-judge-1">LLM as a Judge</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">LLM Evaluations using Inspect</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Mehrin Kiani </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 20, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Earlier this year, I took the course Mastering large language model (LLM) For Developers &amp; Data Scientists <span class="citation" data-cites="mastering_llms_2024">(<a href="#ref-mastering_llms_2024" role="doc-biblioref">Maven 2024</a>)</span>. The course primarily focussed on fine-tuning LLMs including best practices for fine-tuning a LLM, the maths behind fine-tuning a LLM, and popular tools for fine-tuning LLMs. Apart from fine-tuning, the course also covered relevant content such as Retrieval Augment Generation (RAG), LLM evaluations and LLM deployment. In this post, I will share my notes from the course on LLM evaluations and will cover:</p>
+<ul>
+<li>A primer on LLM evaluations</li>
+<li>A primer on the tool Inspect <span class="citation" data-cites="inspect-2024">(<a href="#ref-inspect-2024" role="doc-biblioref">AI Safety Institute 2024</a>)</span></li>
+<li>An end to end example using Inspect to evaluate an LLMs’ responses for a symptom to disease daignosis</li>
+</ul>
+<p>Much of the content in this blog is my understanding/notes of what the course covered though the example in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a> is not specific to the course. If you are already familiar with LLM evaluations, and the Inspect tool, please feel free to go to the example in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a> where I cover a step by step walk through for evaluating an LLMs’ responses.</p>
+<p>In case you would like more information on LLM evaluations beyond this blog, I would highly recommend reading the cited references, and also taking the course <span class="citation" data-cites="mastering_llms_2024">(<a href="#ref-mastering_llms_2024" role="doc-biblioref">Maven 2024</a>)</span>. Most of the content from the course is still available to watch freely on YouTube.</p>
+</section>
+<section id="why-do-we-need-llm-evaluations" class="level1">
+<h1>Why do we need LLM Evaluations?</h1>
+<p>For the uninitated, LLM evaluations are important to calibrate the performance of an LLM for a given task. For example, if we want to use an LLM for an AI driven medical diagnosis given some symptoms by a user there are multiple techniques available for adapting an LLM such as: 1) use LLM as is out of the box i.e.&nbsp;zero shot prompting, 2) few-shot learning, 3) RAG, or 4) fine-tune an LLM. Though how do we decide which technique(s) is giving us the best response from an LLM for a given task?</p>
+<p>Apart from the choice between different techniques for adapting an LLM to a certain task, if we want to calibrate other “hyperparameters” for an LLM such as one system prompt versus another, or if we choose a different base LLM say Mistral 7B instead Llama 3 7B, how can we conclude which model or system prompt is giving us better results?</p>
+<p>The aforementioned questions provide the motivation for LLM evaluations: a framework for calibrating the performance of an LLM for a given task and can also be leveraged to choose “hyperparameters” for optimal LLM performance as illustrated in <a href="#fig-why-llm-evals" class="quarto-xref">Figure&nbsp;1</a>. This is also why we should version our system prompts and LLM evaluation results together.</p>
+<div id="fig-why-llm-evals" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-why-llm-evals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A(User enters symptoms) --&gt; B(Large Language Model application &lt;br&gt; gives medical diagnosis)
+  F(System Prompt v1) -.-&gt; B
+  G(System Prompt v2) -.-&gt; B
+  B --&gt; C1(Medical diagnosis using system prompt 1)
+  B --&gt; C2(Medical diagnosis using system prompt 2)
+  C1 --&gt; D{LLM evaluation help answer &lt;br&gt;  which response is better?} 
+  C2 --&gt; D{LLM evaluation help answer &lt;br&gt; which response is better?} 
+  D --&gt; E(System Prompt 1 is better)
+
+  style A color:purple
+  style B color:green
+  style C1 color:red
+  style F color:red
+  style C2 color:blue
+  style G color:blue
+  style E color:red
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-why-llm-evals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: An over-simplified illustration for the importance of Large Language Model (LLM) evaluations in quantifying the performance of an LLM. LLM evaluations can also be leveraged as a data fly-wheel for iterativetly improving an LLM performance. For example, in this case the choice between system prompt 1 or 2 can be informed by LLM evaluations. Likewise, choice between which base models such as Mistral 7B or Llama 3 7B to use can also be made using LLM evaluations.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="llm-evaluations" class="level1">
+<h1>LLM Evaluations</h1>
+<p>LLM evaluations are an integral component for quantifying the performance of an LLM. As our dataset evolves, or our use-cases for LLM based product changes, we would need to be able to iterate on our evaluations to improve LLM performance.</p>
+<p>At the core of good, quality LLM evaluation is an understanding of data. As Hamel mentions <a href="https://hamel.dev/blog/posts/evals/">[blog]</a>, a sign of quality unit tests is when a LLM struggles to pass them for these failure modes become problems we can solve with techniques like fine-tuning later on. I would also like to emphasize that writing evaluations is an iterative process because of the cyclic dependency between understanding data and writing quality evaluations ♻️</p>
+<ul>
+<li>Understand data by reading data samples, finding patterns, edge cases in data etc.</li>
+<li>Once we have a greater understanding of our data, we can write better evals.</li>
+<li>Better evaluations will help increase our understanding of data</li>
+</ul>
+<p>This section is intentionally a rather brief summary of LLM evaluations. For a more in-depth overview, I would recommend reading <a href="https://hamel.dev/blog/posts/evals/">Hamel Hussain’s blog</a> that gives a comprehensive overview of LLM evaluations as well as inspiration for writing evaluations using a case study. I would also recommend <a href="https://eugeneyan.com/writing/evals/">Eugene Yan’s blog</a> covers different evaluations for different tasks and <a href="https://www.sh-reya.com/blog/ai-engineering-flywheel/">Shreya Shankar’s blog</a> provides a wholistic data flywheel concept to implement evaluations for LLM applications.</p>
+<p>Next, I will cover the three fundamental types of LLM evaluations. In example covered in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a>, I will use Inspect for LLM evaluations though there are other tools available for LLM evals such as <a href="https://github.com/openai/evals">OpenAI evals</a>, <a href="https://github.com/EleutherAI/lm-evaluation-harness">Eluether LM Eval Harness</a>.</p>
+<ul>
+<li>Unit tests</li>
+<li>LLM as a judge</li>
+<li>Human evaluation</li>
+</ul>
+<section id="unit-evaluations" class="level2">
+<h2 class="anchored" data-anchor-id="unit-evaluations">Unit Evaluations</h2>
+<p>In some ways, we can think of unit tests for LLM evaluations as writing tests in a more traditional software development. Though this is more nuanced for LLM applications than a more traditional software because of the non-deterministic nature of LLM responses. Hence, even if some of unit evaluations are failing, it is acceptable unlike more typical software development.</p>
+<p>Some examples of unit tests that can be used to ensure LLM responses are as expected include:</p>
+<ul>
+<li>Is LLM response non-empty?</li>
+<li>Is LLM response numeric as expected, or string as expected?</li>
+<li>Is LLM response length within an expected range?</li>
+<li>If multiple choice, is the response one of the expected choices?</li>
+</ul>
+<p>I like to think of unit evalualtions as more generic evals as compared to LLM as a judge evalualtions which are more domain specific evals. All four examples of unit tests do not require any knowledge of the task domain. In the example covered in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a>, I will cover unit tests.</p>
+</section>
+<section id="llm-as-a-judge" class="level2">
+<h2 class="anchored" data-anchor-id="llm-as-a-judge">LLM as a Judge</h2>
+<p>LLM as a judge is when we use a bigger, more powerful LLM to test the quality of an LLM response being used in an application. A natural question is why don’t we use the bigger, performant model in production to get quality responses: It is usually more expensive to fine-tune a bigger model, and also tends to be more expensive to deploy a bigger model in production.</p>
+<p>In the example covered in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a>, I will also cover LLM as a judge evaluation. The model I will use as a judge is OpenAI <code>gpt-4</code>. The LLM as a jugde evaluation can also be combined with human evaluations to ensure that LLM judgment is in-line with domain experts.</p>
+</section>
+<section id="human-evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="human-evaluation">Human Evaluation</h2>
+<p>This is where we can ask a domain expert to label LLM responses as good or bad to given user queries. We can then use these labelled data samples with domain expert preferences’ to improve model performance. Since human evaluations would require consultations from experts in a given domain, I will not be covering it in this post, though please read <a href="https://hamel.dev/blog/posts/evals/">Hamel Hussain’s blog</a> which provides examples for expert preferences and critique for a natural language query generator.</p>
+<p>Next, I will cover how we can use Inspect to run evaluations on an LLM.</p>
+</section>
+</section>
+<section id="inspect" class="level1">
+<h1>Inspect</h1>
+<p>Inspect <span class="citation" data-cites="inspect-2024">(<a href="#ref-inspect-2024" role="doc-biblioref">AI Safety Institute 2024</a>)</span> is an open source framework that can be used for evaluating LLM responses. Inspect is created by UK AI Safety Institute. At a high level inspect has a <code>Task</code> object that combines three main components of Inspect evaluations as shown in <a href="#fig-inspect-flowchart" class="quarto-xref">Figure&nbsp;2</a>:</p>
+<ul>
+<li>Datasets</li>
+<li>Solvers</li>
+<li>Scorers</li>
+</ul>
+<p>Once we have a dataset from our LLM that we want to evaluate, we need to determine the type of evaluations we want to run on it. A dataset from an LLM mean we have a user query/text given to LLM, and corresponding response from LLM recorded for each given prompt.</p>
+<p>The type of evalution we want to run on a data will determine the solver and scorer we want to use, and this is closely tied to the task our LLM application is performing. So for example, if our LLM application is used for sentiment classification, then we want to run a classification evaluation. If an LLM application is choosing an option from multiple choices, then we can perhaps use <code>multiple_choice()</code> solver with <code>choices()</code> scorer. Inspect offers a number of options to choose from for both scorer and solvers.</p>
+<p>Once a <code>Task</code> is run successfully, it generates a <code>Log</code> file that can be viewed natively in VSCode if Inspect extension is installed as shown in <a href="#fig-inspect-flowchart" class="quarto-xref">Figure&nbsp;2</a>. If Inspect extension is not installed, log file can also be viewed in a browser using <code>$ inspect view</code>.</p>
+<div id="fig-inspect-flowchart" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-inspect-flowchart-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TB
+    subgraph Task[Task]
+        subgraph Component1[Dataset]
+            A(Labelled input and response columns)
+        end
+        
+        subgraph Component2[Solvers]
+            B1(Prompt templating)
+            B2(Generate)
+            B3(Self critique)
+        end
+        
+        subgraph Component3[Scorers]
+            C(Evaluates the response from solvers)
+        end
+        
+        Component1 --&gt; Component2
+        Component2 --&gt; Component3
+    end
+    
+    subgraph Component4[Logs]
+        D(Task completion generates a log file)
+    end    
+    Task --&gt; Component4    
+
+    style Task rx:10,ry:10,color:purple
+    style Component1 rx:10,ry:10,color:green
+    style Component2 rx:10,ry:10,color:red
+    style Component3 rx:10,ry:10,color:blue
+    style Component4 rx:10,ry:10,color:brown
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-inspect-flowchart-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: An illustration for Inspect object <code>Task</code> that combines the three basic components of Inspect: Datasets, Solvers, and Scorers. Upon successful completion of a task, a log file is generated that can be viewed in VSCode if Inspect extension is installed. <a href="#fig-log-file" class="quarto-xref">Figure&nbsp;4</a> shows a sample log file.
+</figcaption>
+</figure>
+</div>
+<p>The Inspect documentation covers standalone examples, such as one shown in <a href="#fig-standalone-theory-of-mind" class="quarto-xref">Figure&nbsp;3</a>, for different datasets, and corresponding solvers and scorers. In the following sections, I provide a brief summary of the Task components, though would recommend reading <a href="https://inspect.ai-safety-institute.org.uk/">Inspect documentation</a> for more details.</p>
+<div id="fig-standalone-theory-of-mind" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-standalone-theory-of-mind-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="e5977724" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># theory.py</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai <span class="im">import</span> Task, task</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai.dataset <span class="im">import</span> example_dataset</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai.scorer <span class="im">import</span> model_graded_fact</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai.solver <span class="im">import</span> (               </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  prompt_template, generate, self_critique   </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)                                             </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>DEFAULT_PROMPT<span class="op">=</span><span class="st">"</span><span class="sc">{prompt}</span><span class="st">"</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">@task</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> theory_of_mind():</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Task(</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        dataset<span class="op">=</span>example_dataset(<span class="st">"theory_of_mind"</span>),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        solver<span class="op">=</span>[</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>          prompt_template(DEFAULT_PROMPT),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>          generate(),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>          self_critique()</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        scorer<span class="op">=</span>model_graded_fact()</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-standalone-theory-of-mind-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: A complete, stand alone example from Inspect documentation that outlines the usage of three basic components, encapuslated in <code>Task</code>: Datasets, Solvers, and Scorers for Theory of mind. The decorator <code>@task</code> helps find Inspect the task to run. In this case, there are three solvers applied to theory of mind dataset. The task can be run using <code>$ inspect eval theory.py --model openai/gpt-4</code>. Please note you will need <code>OPENAI_API_KEY</code> in your environment to run the task.
+</figcaption>
+</figure>
+</div>
+<section id="dataset" class="level2">
+<h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
+<p>Dataset is the data you want to apply your evaluations on. It should have at least two columns: user input that was sent to an LLM, and the response from the LLM. Inspect offers a first class support for loading csv files, and also natively supports laoding datasets from Hugging Face.</p>
+</section>
+<section id="solver" class="level2">
+<h2 class="anchored" data-anchor-id="solver">Solver</h2>
+<p>Solvers are functions that transform dataset inputs such as prompt generation, call an LLM for generation, and act further on LLM output such as self-critique. Solvers can also be composed together as layers as shown in <a href="#fig-standalone-theory-of-mind" class="quarto-xref">Figure&nbsp;3</a>, or can be a single layer with higher internal complexity. Some examples of solvers include:</p>
+<ul>
+<li>Providing system prompts</li>
+<li>Prompt engineering (e.g.&nbsp;chain of thought)</li>
+<li>Model generation</li>
+<li>Self critique</li>
+</ul>
+</section>
+<section id="scorer" class="level2">
+<h2 class="anchored" data-anchor-id="scorer">Scorer</h2>
+<p>Scorers evaluates the output from solvers. Solvers may use text comparisons, model grading, or other custom schemes. In summary, scorers evaluate whether solvers were successful in finding the right output for the target defined in the dataset, and in what measure. Some examples of Scorers available in Inspect include:</p>
+<ul>
+<li><p>Extracting a specific answer out of a model’s completion output using heuristics.</p></li>
+<li><p>Applying a text similarity algorithm to see if a model’s response is close to target.</p></li>
+</ul>
+</section>
+<section id="logs" class="level2">
+<h2 class="anchored" data-anchor-id="logs">Logs</h2>
+<p>Log files contain results of an evaluation output. Inspect has a VSCode extension that can be used to view log files seamlessly. <a href="#fig-log-file" class="quarto-xref">Figure&nbsp;4</a> shows a part of a log file generated by a validate task on a theory of mind dataset as outlined in <a href="#fig-standalone-theory-of-mind" class="quarto-xref">Figure&nbsp;3</a>. The log file in <a href="#fig-log-file" class="quarto-xref">Figure&nbsp;4</a> shows</p>
+<ul>
+<li>For each data instance a score as Correct (C) or Incorrect (I) is given by the scorer</li>
+<li>The overall accuracy on right top indicates the number of data samples that resulted in correct evaluations</li>
+</ul>
+<div id="fig-log-file" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-log-file-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/inspect_log_example.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-log-file-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: An illustration for a log file generated for a “validate” task viewed using Inspect extension in VSCode.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-example" class="level1">
+<h1>Example: Evaluating LLM Responses on Symptom to Disease Diagnosis</h1>
+<p>In this section, I will cover how I developed LLM evaluations for a hypothetical LLM application that is being used for disease diagnostics given some symptoms. The base LLM I am using is <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a>.</p>
+<p>The example is run locally on VSCode, and I have installed Inspect extension to view log files.</p>
+<section id="data" class="level2">
+<h2 class="anchored" data-anchor-id="data">Data</h2>
+<p>The dataset used for evaluating consists of 1200 instances where each sample has <code>text</code> that explains the symptoms and <code>label</code> that tells corresponding disease name. The dataset is made available by Mistral AI, and can be found on Github <span class="citation" data-cites="mistral2024">Mistral-AI (<a href="#ref-mistral2024" role="doc-biblioref">2024</a>)</span>. <a href="#tbl-sample-dataset" class="quarto-xref">Table&nbsp;1</a> has two entries from the dataset. The dataset contains symptoms for 24 diseases. A full list of disease names is included in <code>SYSTEM_PROMPT</code> in <a href="#fig-system-prompt" class="quarto-xref">Figure&nbsp;5</a>.</p>
+<div id="tbl-sample-dataset" class="quarto-float quarto-figure quarto-figure-center anchored" data-tbl-colwidths="[25,75]">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sample-dataset-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Two data instances from symptom to disease dataset <span class="citation" data-cites="mistral2024">Mistral-AI (<a href="#ref-mistral2024" role="doc-biblioref">2024</a>)</span>. The <code>text</code> column has the symptoms and <code>label</code> has corresponding disease name.
+</figcaption>
+<div aria-describedby="tbl-sample-dataset-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 75%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>label</th>
+<th style="text-align: left;">text</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Psoriasis</td>
+<td style="text-align: left;">I have been experiencing a skin rash on my arms, legs, and torso for the past few weeks. It is red, itchy, and covered in dry, scaly patches.</td>
+</tr>
+<tr class="even">
+<td>Varicose Veins</td>
+<td style="text-align: left;">Long durations of standing or walking have caused severe discomfort in my legs. It’s a burning ache that gets worse the longer I’m on my feet.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="model-responses" class="level2">
+<h2 class="anchored" data-anchor-id="model-responses">Model Responses</h2>
+<p>In this section, I will use <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a> to get diagnosis for each entry/symptom description in the dataset <a href="#tbl-sample-dataset" class="quarto-xref">Table&nbsp;1</a>.</p>
+<p>I am using <code>Mistral-7B-Instruct-v0.3</code> model because it is already fine-tuned to follow instructions. I also experimented a bit with Llama 3 7B though since it is not fine-tuned to follow instructions, the Llama responses comprised more of text generation than diagnosing a disease.</p>
+<p>For this example, I included particular instructions I wanted <code>Mistral-7B-Instruct-v0.3</code> to follow for medical disgnostics in <code>SYSTEM_PROMPT</code>. In short, the instructions included to respond with a disease name that is most likely causing the symptoms as entered by a user. The complete <code>SYSTEM_PROMPT</code> is shown in <a href="#fig-system-prompt" class="quarto-xref">Figure&nbsp;5</a>.</p>
+<div id="fig-system-prompt" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-system-prompt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="faf73854" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SYSTEM_PROMPT <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">You are an expert medical professional named Medical AI. </span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">Using the text provided by a user which is explaining symptoms of a disease, give your diagnosis. </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">You have to choose from one of the diseases below:</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">Psoriasis                          </span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="st">Varicose Veins                     </span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="st">peptic ulcer disease               </span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="st">drug reaction                      </span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="st">gastroesophageal reflux disease    </span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="st">allergy                            </span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="st">urinary tract infection            </span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="st">Malaria                            </span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="st">Jaundice                           </span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="st">Cervical spondylosis               </span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="st">Migraine                           </span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="st">Hypertension                       </span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="st">Bronchial Asthma                   </span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="st">Acne                               </span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="st">Arthritis                          </span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="st">Dimorphic Hemorrhoids              </span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="st">Pneumonia                          </span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="st">Common Cold                        </span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="st">Fungal infection                   </span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="st">Dengue                             </span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="st">Impetigo                           </span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="st">Chicken pox                        </span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="st">Typhoid                            </span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="st">diabetes  </span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="st">Do not add any other text except the disease name. </span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="st">For example: </span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="st">User input: The skin around my mouth, nose, and eyes is red and inflamed. It is often itchy and uncomfortable. There is a noticeable inflammation in my nails</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="st">Medical AI: Psoriasis</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="st">User input:</span><span class="sc">{{</span><span class="st">prompt</span><span class="sc">}}</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="st">Medical AI:</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-system-prompt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: <code>SYSTEM_PROMPT</code> as used in the example to query <code>Mistral-7B-Instruct-v0.3</code> for getting diagnosis based on symptoms as entered by a user. The <code>{prompt}</code> will get replaced by symptoms from <code>text</code> field of dataset <span class="citation" data-cites="mistral2024">Mistral-AI (<a href="#ref-mistral2024" role="doc-biblioref">2024</a>)</span>.
+</figcaption>
+</figure>
+</div>
+<p>To use <code>Mistral-7B-Instruct-v0.3</code> to get the responses, I installed <code>mistral_inference</code>, and downloaded the model from Hugging Face. Complete code block for getting <code>Mistral-7B-Instruct-v0.3</code> response for each data instace in symptom to disease dataset is shown in <a href="#fig-code-block-mistral-inference" class="quarto-xref">Figure&nbsp;6</a>.</p>
+<div id="fig-code-block-mistral-inference" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-code-block-mistral-inference-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="9af233a2" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> huggingface_hub <span class="im">import</span> snapshot_download</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mistral_inference.transformer <span class="im">import</span> Transformer</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mistral_inference.generate <span class="im">import</span> generate</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mistral_common.tokens.tokenizers.mistral <span class="im">import</span> MistralTokenizer</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mistral_common.protocol.instruct.messages <span class="im">import</span> UserMessage</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mistral_common.protocol.instruct.request <span class="im">import</span> ChatCompletionRequest</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>mistral_models_path <span class="op">=</span> Path.home().joinpath(<span class="st">'mistral_models'</span>, <span class="st">'7B-Instruct-v0.3'</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>mistral_models_path.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>snapshot_download(repo_id<span class="op">=</span><span class="st">"mistralai/Mistral-7B-Instruct-v0.3"</span>, allow_patterns<span class="op">=</span>[<span class="st">"params.json"</span>, <span class="st">"consolidated.safetensors"</span>, <span class="st">"tokenizer.model.v3"</span>], local_dir<span class="op">=</span>mistral_models_path)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> MistralTokenizer.from_file(<span class="ss">f"</span><span class="sc">{</span>mistral_models_path<span class="sc">}</span><span class="ss">/tokenizer.model.v3"</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Transformer.from_folder(mistral_models_path, device <span class="op">=</span> <span class="st">"cuda"</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Data</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Symptom2Disease.csd Dataset: !wget https://raw.githubusercontent.com/mistralai/cookbook/refs/heads/main/data/Symptom2Disease.csv</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>dataframe <span class="op">=</span> pd.read_csv(<span class="st">"Symptom2Disease.csv"</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>shuffled_dataframe <span class="op">=</span> dataframe.sample(frac<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Iterate through prompts with progress bar</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> index, row <span class="kw">in</span> tqdm(data.iterrows(), total<span class="op">=</span><span class="bu">len</span>(data)):</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Get LLM response - modify this part according to your LLM API</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        prompt <span class="op">=</span> SYSTEM_PROMPT.replace(<span class="st">"</span><span class="sc">{{</span><span class="st">prompt</span><span class="sc">}}</span><span class="st">"</span>, row[<span class="st">"text"</span>])</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        completion_request <span class="op">=</span> ChatCompletionRequest(messages<span class="op">=</span>[UserMessage(content<span class="op">=</span>prompt)])</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        tokens <span class="op">=</span> tokenizer.encode_chat_completion(completion_request).tokens</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        out_tokens, _ <span class="op">=</span> generate([tokens], model, max_tokens<span class="op">=</span><span class="dv">64</span>, temperature<span class="op">=</span><span class="fl">0.0</span>, eos_id<span class="op">=</span>tokenizer.instruct_tokenizer.tokenizer.eos_id)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        response_text <span class="op">=</span> tokenizer.instruct_tokenizer.tokenizer.decode(out_tokens[<span class="dv">0</span>])</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Store original prompt and response</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        results.append({</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>            <span class="st">'prompt'</span>: row[<span class="st">'text'</span>],</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>            <span class="st">'response'</span>: response_text</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(response_text)</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Optional: Add delay to respect rate limits</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.1</span>)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Error processing prompt at index </span><span class="sc">{</span>index<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Store error in results</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>        results.append({</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>            <span class="st">'prompt'</span>: row[<span class="st">'prompt'</span>],</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>            <span class="st">'response'</span>: <span class="ss">f"ERROR: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Create new dataframe with results</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>results_df <span class="op">=</span> pd.DataFrame(results)</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="co"># Save to CSV</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>results_df.to_csv(<span class="st">'llm_responses.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-code-block-mistral-inference-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Code used for getting <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a> responses for system to disease dataset <span class="citation" data-cites="mistral2024">Mistral-AI (<a href="#ref-mistral2024" role="doc-biblioref">2024</a>)</span>.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="unit-evaluations-1" class="level2">
+<h2 class="anchored" data-anchor-id="unit-evaluations-1">Unit Evaluations</h2>
+<p>The first form of evaluations to consider are unit evaluations that ensure that our LLM is responding with expected response. For this example we are using <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a> to diagnose a disease based on given symptoms. In order to evaluate <code>Mistral-7B-Instruct-v0.3</code> responses for medical diagnosis using unit evaluation, we can test for following unit evaluations:</p>
+<ol type="1">
+<li>Response is non null</li>
+<li>Response only contains strings</li>
+<li>Response has one of the disease names as outlined in <code>SYSTEM_PROMPT</code> in <a href="#fig-system-prompt" class="quarto-xref">Figure&nbsp;5</a>.</li>
+</ol>
+<p>Though the first two are not domain specific evaluations, the third one can be deemed somewhat domain specific though still no domain knowledge is required for third evaluation per se. Hence for unit evaluations, we do not require to use another LLM as a judge just yet. An excerpt from code for unit evaluation is shown in <a href="#fig-unit-evals-code" class="quarto-xref">Figure&nbsp;7</a>.</p>
+<div id="fig-unit-evals-code" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-unit-evals-code-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="449f1e69" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TestSample:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data: Dict):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.data <span class="op">=</span> data</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.test_results <span class="op">=</span> {}</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> run_tests(<span class="va">self</span>):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Test 1: Non-Empty Response</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.test_results[<span class="st">'non_empty_response'</span>] <span class="op">=</span> <span class="kw">not</span> pd.isna(<span class="va">self</span>.data[<span class="st">'response'</span>]) <span class="kw">and</span> <span class="va">self</span>.data[<span class="st">'response'</span>] <span class="op">!=</span> <span class="st">''</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Test 2: String Type</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.test_results[<span class="st">'all_string'</span>] <span class="op">=</span> <span class="bu">isinstance</span>(<span class="va">self</span>.data[<span class="st">'response'</span>], <span class="bu">str</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Test 3: Valid Disease Name</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.data[<span class="st">'response'</span>] <span class="kw">in</span> POSSIBLE_DISEASES <span class="kw">or</span> POSSIBLE_DISEASES <span class="kw">in</span> <span class="va">self</span>.data[<span class="st">'response'</span>]:                </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.test_results[<span class="st">'valid_disease_name'</span>] <span class="op">=</span> <span class="va">True</span>        </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span>:</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.test_results[<span class="st">'valid_disease_name'</span>] <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.test_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-unit-evals-code-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: An excerpt that shows the unit evaluations being used to assert that response from LLM for diagnosis is non-empty, contains all strings, and contains one of the possible disease names. Further additions may also include for case insensitive tests.
+</figcaption>
+</figure>
+</div>
+<p>I ran the evaluation on all 1200 data samples, i.e.&nbsp;responses obtained from <code>Mistral-7B-Instruct-v0.3</code>, and saved results in a .csv file for later use purposes. I also generated a bar plot shown in <a href="#fig-log-file-unit-test-symptom2disease" class="quarto-xref">Figure&nbsp;8</a> where we can see that all responses from <code>Mistral-7B-Instruct-v0.3</code> were non-empty, and contained strings only. Though around 600 samples failed to include a disease name in response.</p>
+<div id="fig-log-file-unit-test-symptom2disease" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-log-file-unit-test-symptom2disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/unit_evaluations_plot.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-log-file-unit-test-symptom2disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Unit evaluations run on <code>Mistral-7B-Instruct-v0.3</code> model response passed non-empty response, and all string response, though almost half of responses failed to include a disease name.
+</figcaption>
+</figure>
+</div>
+<p>In <a href="#fig-unit-eval-failed-samples" class="quarto-xref">Figure&nbsp;9</a>, I have listed some responses that are failing the “disease name in response” test. A quick look tells that these responses did indeed have a disease name though failed the unit evaluations because the case didn’t match between model response and the name of the disease in <code>POSSIBLE_DISEASES</code>.</p>
+<div id="fig-unit-eval-failed-samples" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-unit-eval-failed-samples-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<pre id="fig-unit-eval-failed-samples" class="{markdown}"><code>Response does not contain valid disease name:
+,response
+2,Gastroesophageal Reflux Disease (GERD)
+5,Peptic Ulcer Disease
+11,"Psoriasis (for the first user input)
+Varicose Veins (for the second user input)
+(For the third user input, the symptoms provided are not specific to any of the listed diseases. It could be a sign of various conditions such as eczema, seborrheic"
+12,Psoriatic Arthritis (This condition is a combination of psoriasis and arthritis.)
+13,Jaundice (possibly associated with Hepatitis or other liver diseases)
+15,Allergy
+17,Cervical Spondylosis
+18,Jaundice (possibly due to Hepatitis or Gallstones)
+20,Common Cold or Bronchial Asthma (depending on the persistence and severity of symptoms)
+24,Peptic Ulcer Disease
+25,Peptic Ulcer Disease
+28,Flu (Influenza)
+33,Peptic Ulcer Disease
+40,Peptic Ulcer Disease
+42,Peptic Ulcer Disease
+43,Common Cold or Flu (Influenza)
+46,Flu (Influenza)
+50,Peptic Ulcer Disease
+51,Peptic Ulcer Disease
+52,Common Cold or Allergy (further evaluation is needed to differentiate)
+</code></pre>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-unit-eval-failed-samples-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: A few of the responses that failed the “response contains a disease name” test. As we can see that in each reponse there does seem to be a disease name though our unit test is case sensitive which is generating a lot of false positives.
+</figcaption>
+</figure>
+</div>
+<p>For the next iteration of unit evaluations, I updated the test to be case insensitive and the new results are as shown in <a href="#fig-log-file-unit-test-case-insensitive-symptom2disease" class="quarto-xref">Figure&nbsp;10</a>. There is a significant improvement in “response contains a disease name” test. Some of the responses that still failed the test are listed in <a href="#fig-unit-eval-failed-samples-v2" class="quarto-xref">Figure&nbsp;11</a>.</p>
+<div id="fig-log-file-unit-test-case-insensitive-symptom2disease" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-log-file-unit-test-case-insensitive-symptom2disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/unit_evaluations_plot_case_insensitive.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-log-file-unit-test-case-insensitive-symptom2disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Unit evaluations run on <code>Mistral-7B-Instruct-v0.3</code> model response passed non-empty response, and all string response, though almost half of responses failed to include a disease name.
+</figcaption>
+</figure>
+</div>
+<div id="fig-unit-eval-failed-samples-v2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-unit-eval-failed-samples-v2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<pre id="fig-unit-eval-failed-samples-v2" class="{markdown}"><code>Response does not contain valid disease name:
+,response
+2,Gastroesophageal Reflux Disease (GERD)
+11,"Psoriasis (for the first user input)
+Varicose Veins (for the second user input)
+(For the third user input, the symptoms provided are not specific to any of the listed diseases. It could be a sign of various conditions such as eczema, seborrheic"
+12,Psoriatic Arthritis (This condition is a combination of psoriasis and arthritis.)
+13,Jaundice (possibly associated with Hepatitis or other liver diseases)
+18,Jaundice (possibly due to Hepatitis or Gallstones)
+20,Common Cold or Bronchial Asthma (depending on the persistence and severity of symptoms)
+28,Flu (Influenza)
+43,Common Cold or Flu (Influenza)
+46,Flu (Influenza)
+52,Common Cold or Allergy (further evaluation is needed to differentiate)
+61,"Lymphadenopathy (could be caused by various conditions, further investigation is needed)"
+74,Varicose Veins (again)
+</code></pre>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-unit-eval-failed-samples-v2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: A few of the responses that failed the “response contains a disease name” test. As we can see that in each reponse there does seem to be a disease name though some samples do not seem to have same disease name as in <code>POSSIBLE_DISEASE</code> list such as <code>Flu</code>.
+</figcaption>
+</figure>
+</div>
+<p>In a furture iteration, we can perhaps add synonyms for common disease such as <code>Flu</code> is same as <code>Cold</code>, or <code>Common Cold</code>. Next, I will cover LLM as a Judge for evaluating <code>Mistral-7B-Instruct-v0.3</code> responses.</p>
+</section>
+<section id="llm-as-a-judge-1" class="level2">
+<h2 class="anchored" data-anchor-id="llm-as-a-judge-1">LLM as a Judge</h2>
+<p>For using an LLM as a judge, we can query another, more powerful LLM and “make it a judge” to assess the response quality. Inspect support most of the popular models such as OpenAI, Anthropic, Google, Mistral. For a complete list of supported models please read <a href="https://inspect.ai-safety-institute.org.uk/models.html">here</a>. Please note, we will need API key for the model we want to use as our judge.</p>
+<p>The critique prompt should include background and instructions for the judge LLM to use as a guide for its critique of <code>Mistral-7B-Instruct-v0.3</code> responses. <a href="#fig-critique-text" class="quarto-xref">Figure&nbsp;12</a> is an excerpt from critique prompt that I used in this example though please note the critique prompt is generated using an LLM and may not be representative of best practices in medical diagnostics.</p>
+<div id="fig-critique-text" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-critique-text-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<pre id="fig-critique-text" class="{markdown}"><code>## Background
+
+A medical diagnosis system should evaluate symptoms and provide accurate disease predictions. The system should consider:
+
+1. Primary symptoms (major indicators of the disease)
+2. Secondary symptoms (supporting symptoms)
+3. Location and distribution of symptoms
+4. Symptom severity, duration, and progression
+5. Common comorbidities and complications
+6. Risk factors and patient demographics
+7. Seasonal patterns (when applicable)
+8. Symptom triggers and alleviating factors
+
+## Instructions
+
+You are an EXPERT medical professioanl evaluating symptom-to-disease predictions. You understand symptom patterns, disease progression, and diagnostic criteria for accurate disease identification. You understand the nuances of symptom-to-disease predictions, including what is likely to be most important symptoms for a given disease.
+
+You are given the following two inputs: (1) SYMPTOMS, (2) PREDICTION. Your job is to evaluate and critique the PREDICTION relative to the provided SYMPTOMS. 
+
+The critiques must be provided in the same json format as provided in the examples below:
+
+Inputs:
+1. Patient symptom description (SYMPTOMS)
+2. Predicted disease (PREDICTION)
+
+The critique system should evaluate:
+- Symptom pattern matching
+- Presence of disease-specific indicators
+- Appropriate symptom timing and progression
+- Correct interpretation of constitutional symptoms
+- Recognition of complicating factors
+- Proper differentiation from similar conditions
+- Consideration of risk factors and demographics
+- Identification of red flags requiring immediate attention
+
+For the below SYMPTOMS and PREDICTION provide a critique as JSON in the format {"critique": "...", "outcome": "good"|"bad"} as shown above. Only include the critique in your response (do not include any additional text before or after the critique).
+
+Outcomes should be marked "good" when predictions accurately match symptom patterns and "bad" when key diagnostic features are missed or misinterpreted.
+
+
+---
+
+SYMPTOMS: "I've been having severe stomach pain, especially when hungry. The pain improves after eating but comes back after a few hours. I sometimes feel nauseous and have noticed dark stools."
+
+PREDICTION: Peptic Ulcer Disease
+
+{"critique": "Excellent prediction. Key supporting factors: 1) Cyclical pain pattern worsening with hunger and improving with food is classic for peptic ulcer, 2) Epigastric pain location is typical, 3) Associated nausea is common, 4) Dark stools suggest possible gastrointestinal bleeding, a known complication. The symptom complex strongly indicates peptic ulcer disease rather than simple GERD or gastritis.", "outcome": "good"}
+
+---</code></pre>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-critique-text-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12: Some exceprt from critique prompt that I used for LLM as a judge. Disclaimer: I have used an LLM to generate example critiques which may not be representative of real medical diagnostics. This critique is to just show case how one LLM can be used as a judge to evaluate another LLMs responses.
+</figcaption>
+</figure>
+</div>
+<p>I used OpenAI <code>gpt4</code> model as a judge to critique <code>Mistral-7B-Instruct-v0.3</code> responses. <a href="#fig-log-file-llm-judge-symptom2disease" class="quarto-xref">Figure&nbsp;13</a> outlines critique obtained on one sample where <code>gpt4</code> and <code>Mistral-7B-Instruct-v0.3</code> responses are not in agreement.</p>
+<p>The critique from an LLM can also be used in tandem with subject experts, medical professionals in this case, to curate data for fine-tuning. Though this should be used with caution as it can help propagate human or LLM bias in fine-tuning dataset which in turn would result in skewed responses from a fine-tuned model.</p>
+<div id="fig-log-file-llm-judge-symptom2disease" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-log-file-llm-judge-symptom2disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/critique_sample_log_file.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-log-file-llm-judge-symptom2disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13: A sample showing critique for a medical diagnosis that judge LLM thought was a poor diagnosis. It includes explanation for its critique.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>In this blog, I covered my notes on LLM evaluations from the course Mastering large language model (LLM) For Developers &amp; Data Scientists <span class="citation" data-cites="mastering_llms_2024">(<a href="#ref-mastering_llms_2024" role="doc-biblioref">Maven 2024</a>)</span>. LLM evaluations provide a framework for evaluating the performance of an LLM. It might help to think of LLM evaluations as an iterative process which helps improve our understanding of LLM responses/data we are evaluating. A better understanding of LLM responses helps write better LLM evaluations, which in turn helps to understand LLM responses by gaining insights from where LLM evaluations failed and passed.</p>
+<p>As LLMs evolve, it is important to think of more nuanced evaluation frameworks that consider reasoning, truthfulness, and real-world applicability. Also, an appreciation that no single metric can fully capture an LLM’s capabilities – instead, a holistic approach combining quantitative benchmarks, qualitative assessments, and domain-specific testing will be crucial.</p>
+</section>
+<section id="references" class="level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-inspect-2024" class="csl-entry" role="listitem">
+AI Safety Institute, UK. 2024. <span>“Inspect <span>AI:</span> <span>Framework</span> for <span>Large</span> <span>Language</span> <span>Model</span> <span>Evaluations</span>.”</span> <a href="https://github.com/UKGovernmentBEIS/inspect_ai">https://github.com/UKGovernmentBEIS/inspect_ai</a>.
+</div>
+<div id="ref-mastering_llms_2024" class="csl-entry" role="listitem">
+Maven. 2024. <span>“Mastering <span>LLMs</span> for <span>Developers</span> and <span>Data</span> <span>Scientists</span>.”</span> Course. Maven. 2024. <a href="https://www.maven.com/">https://www.maven.com/</a>.
+</div>
+<div id="ref-mistral2024" class="csl-entry" role="listitem">
+Mistral-AI. 2024. <span>“Symptom to Disease Dataset.”</span> <a href="https://github.com/mistralai/cookbook/blob/main/data/Symptom2Disease.csv" class="uri">https://github.com/mistralai/cookbook/blob/main/data/Symptom2Disease.csv</a>; Mistral AI.
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/mehrinkiani\.github\.io\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
