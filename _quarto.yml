@@ -4,6 +4,8 @@ project:
 
 website:
   title: "Mehrin Kiani's Blog"
+  
+  
   navbar:
     right:
       - about.qmd
@@ -11,10 +13,13 @@ website:
         href: https://github.com/mehrinkiani
       - icon: twitter
         href: https://x.com/KianiMehrin
+  
 format:
   html:
     theme: cosmo
     css: styles.css
+    mermaid:
+      theme: neutral
 
 execute:
   freeze: auto
