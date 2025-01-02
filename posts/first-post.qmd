@@ -1,7 +1,0 @@
----
-title: "Welcome To My Blog"
-date: "2024-12-19"
-categories: [news]
----
-
-First post! 
