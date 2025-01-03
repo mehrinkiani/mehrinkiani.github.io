@@ -18,7 +18,7 @@ Earlier this year, I took the course Mastering large language model (LLM) For De
 
 * A primer on LLM evaluations 
 * A primer on the tool Inspect [@inspect-2024] 
-* An end to end example using Inspect to evaluate an LLMs' responses for an AI driven medical diagnosis  
+* An end to end example using Inspect to evaluate an LLMs' responses for an AI driven medical diagnosis. The code is available on [Github](https://github.com/mehrinkiani/llm-evaluations)
     
 Much of the content in this blog is my understanding of what the course covered though the example in @sec-example is not specific to the course. If you are already familiar with LLM evaluations, and the Inspect tool, please feel free to go to the example in @sec-example where I cover a step by step walk through for evaluating an LLMs' responses for an AI driven medical diagnosis. 
 
@@ -221,7 +221,7 @@ Log files contain results of an evaluation output. Inspect has a VSCode extensio
 
 In this section, I will cover how I developed LLM evaluations for a hypothetical LLM application that is being used for disease diagnostics given some symptoms. The base LLM I am using is [`mistralai/Mistral-7B-Instruct-v0.3`](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3). I will adapt `mistralai/Mistral-7B-Instruct-v0.3` for disease diagnostics using few-shot prompting. Though we will see later in the example when our evaluation results would indicate that for better responses we might need to explore RAG or perhaps fine-tune `mistralai/Mistral-7B-Instruct-v0.3`.
 
-The evaluations in the example are run locally on VSCode, and I have installed Inspect extension to view log files. Though I used Google Colab for getting `mistralai/Mistral-7B-Instruct-v0.3` responses on dataset that contains symptoms. 
+The evaluations in the example are run locally on VSCode, and I have installed Inspect extension to view log files. Though I used Google Colab for getting `mistralai/Mistral-7B-Instruct-v0.3` responses on dataset that contains symptoms. The code is available on [Github](https://github.com/mehrinkiani/llm-evaluations).
 
 ## Data     
 The dataset used for evaluating consists of 1200 instances where each sample has `text` that explains the symptoms and `label` that tells corresponding disease name. The dataset is made available by Mistral AI, and can be found on Github @mistral2024. @tbl-sample-dataset has two entries from the dataset. The dataset contains symptoms for 24 diseases. A full list of disease names is included in `SYSTEM_PROMPT` in @fig-system-prompt.
@@ -238,7 +238,7 @@ A side note that when using an LLM as is, `mistralai/Mistral-7B-Instruct-v0.3` i
 
 ## Model Responses
 
-In this section, I will use [`mistralai/Mistral-7B-Instruct-v0.3`](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) to get diagnosis for each entry/symptom description in the dataset @tbl-sample-dataset. 
+In this section, I will use [`mistralai/Mistral-7B-Instruct-v0.3`](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) to get diagnosis for each entry/symptom description in the dataset @tbl-sample-dataset. `Mistral-7B-Instruct-v0.3` is available on Hugging Face though the model is gated, and so we would need to agree to their terms to gain access.  
 
 I am using `Mistral-7B-Instruct-v0.3` model because it is already fine-tuned to follow instructions. I also experimented a bit with Llama 3 7B though since it is not fine-tuned to follow instructions, the Llama responses comprised more of text generation than diagnosing a disease.
 
