@@ -21,11 +21,7 @@ Hello! and welcome to my Machine Learning (ML) blog!
 I plan using my blog to share what I learn. 
 
 ## Work Experience
-I work as a Machine Learning Scientist. Part of my reserch work focussed on ModelScan: It is an OSS project that scans Machine Learning (ML) models to determine if they contain unsafe code, i.e. scans for Model Serialization Attack (MSA). 
-
-- Build a proof of concept for model serialization attacks for the aforementioned ML libraries 
-- Wrote Jupyter Notebooks to demonstrate MSA on Tensorflow, Keras, PyTorch, XGBoost models.
-- Develop ModelScan to detect model serialization attacks *without* loading the model for the aforementioned ML frameworks
+I work as a Machine Learning Scientist. A part of my reserch work focussed on ModelScan: It is an OSS project that scans Machine Learning (ML) models to determine if they contain unsafe code, i.e. scans for Model Serialization Attack (MSA). ModelScan is being used to scan models on Hugging Face. 
 
 ## Educational Background
 I have a PhD in Computer Science from University of Essex, England. My research work focussed on developing novel ML algorithms to inform our understanding of developmental cognitive neuroscience. More details of my research can be found on my [Google Scholar](https://scholar.google.com/citations?user=gqvfKwgAAAAJ&hl=en).
