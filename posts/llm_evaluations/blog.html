@@ -241,20 +241,20 @@ div.csl-indent {
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>Earlier this year, I took the course Mastering large language model (LLM) For Developers &amp; Data Scientists <span class="citation" data-cites="mastering_llms_2024">(<a href="#ref-mastering_llms_2024" role="doc-biblioref">Maven 2024</a>)</span>. The course primarily focussed on fine-tuning LLMs including best practices for fine-tuning a LLM, the maths behind fine-tuning a LLM, and popular tools for fine-tuning LLMs. Apart from fine-tuning, the course also covered relevant content such as Retrieval Augment Generation (RAG), LLM evaluations and LLM deployment. In this post, I will share my notes from the course on LLM evaluations and will cover:</p>
+<p>Earlier this year, I took the course Mastering large language model (LLM) For Developers &amp; Data Scientists <span class="citation" data-cites="mastering_llms_2024">(<a href="#ref-mastering_llms_2024" role="doc-biblioref">Maven 2024</a>)</span>. The course primarily focussed on fine-tuning LLMs including best practices for fine-tuning a LLM, the maths behind it, and popular tools for fine-tuning LLMs. Apart from fine-tuning, the course also covered relevant content such as Retrieval Augment Generation (RAG), LLM evaluations and LLM deployment. In this post, I will share my notes from the course on LLM evaluations and will cover:</p>
 <ul>
 <li>A primer on LLM evaluations</li>
 <li>A primer on the tool Inspect <span class="citation" data-cites="inspect-2024">(<a href="#ref-inspect-2024" role="doc-biblioref">AI Safety Institute 2024</a>)</span></li>
-<li>An end to end example using Inspect to evaluate an LLMs’ responses for a symptom to disease daignosis</li>
+<li>An end to end example using Inspect to evaluate an LLMs’ responses for an AI driven medical diagnosis</li>
 </ul>
-<p>Much of the content in this blog is my understanding/notes of what the course covered though the example in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a> is not specific to the course. If you are already familiar with LLM evaluations, and the Inspect tool, please feel free to go to the example in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a> where I cover a step by step walk through for evaluating an LLMs’ responses.</p>
-<p>In case you would like more information on LLM evaluations beyond this blog, I would highly recommend reading the cited references, and also taking the course <span class="citation" data-cites="mastering_llms_2024">(<a href="#ref-mastering_llms_2024" role="doc-biblioref">Maven 2024</a>)</span>. Most of the content from the course is still available to watch freely on YouTube.</p>
+<p>Much of the content in this blog is my understanding of what the course covered though the example in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a> is not specific to the course. If you are already familiar with LLM evaluations, and the Inspect tool, please feel free to go to the example in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a> where I cover a step by step walk through for evaluating an LLMs’ responses for an AI driven medical diagnosis.</p>
+<p>In case you would like more information on LLM evaluations beyond this post, I would highly recommend reading the cited references, and also taking the course <span class="citation" data-cites="mastering_llms_2024">(<a href="#ref-mastering_llms_2024" role="doc-biblioref">Maven 2024</a>)</span>. Most of the content from the course is still available to watch freely on YouTube.</p>
 </section>
 <section id="why-do-we-need-llm-evaluations" class="level1">
 <h1>Why do we need LLM Evaluations?</h1>
-<p>For the uninitated, LLM evaluations are important to calibrate the performance of an LLM for a given task. For example, if we want to use an LLM for an AI driven medical diagnosis given some symptoms by a user there are multiple techniques available for adapting an LLM such as: 1) use LLM as is out of the box i.e.&nbsp;zero shot prompting, 2) few-shot learning, 3) RAG, or 4) fine-tune an LLM. Though how do we decide which technique(s) is giving us the best response from an LLM for a given task?</p>
-<p>Apart from the choice between different techniques for adapting an LLM to a certain task, if we want to calibrate other “hyperparameters” for an LLM such as one system prompt versus another, or if we choose a different base LLM say Mistral 7B instead Llama 3 7B, how can we conclude which model or system prompt is giving us better results?</p>
-<p>The aforementioned questions provide the motivation for LLM evaluations: a framework for calibrating the performance of an LLM for a given task and can also be leveraged to choose “hyperparameters” for optimal LLM performance as illustrated in <a href="#fig-why-llm-evals" class="quarto-xref">Figure&nbsp;1</a>. This is also why we should version our system prompts and LLM evaluation results together.</p>
+<p>For the uninitated, LLM evaluations are important to calibrate the performance of an LLM for a given task. For example, if we want to use an LLM for an AI driven medical diagnosis given some symptoms by a user there are multiple techniques available for adapting a given LLM such as: 1) use LLM as is out of the box i.e.&nbsp;zero shot prompting, 2) few-shot prompting where we give a few example in the prompt, 3) RAG is when we provide relevant documents for task completion, or 4) fine-tune an LLM that modifies the weights of an LLM. These techniques are usually explored in the order they are listed here primarily because of the time and compute resources they require.</p>
+<p>As we explore these different techniques to adapt an LLM for a given task, there are multiple parameters that need to be configured for each technique. For example, for zero shot or few shot prompting, we need a <code>SYSTEM_PROMPT</code> that explains an LLM how to complete a given task and may also include expected response examples. In this sense, the articulation and explanation in <code>SYSTEM_PROMPT</code> has a significant bearing on the elicited response from an LLM. Likewise, for RAG and fine-tuning the choice of resource document or number of weights to be fine-tuned has an impact on LLM adaptatuon. Though how do we decide which hyperparameters within a technique(s) is giving us better responses? Also, how do we learn that for a given technique, LLMs response quality has plateuad?</p>
+<p>The aforementioned questions provide the motivation for LLM evaluations: a framework for calibrating the performance of an LLM for a given task and can also be leveraged to choose “hyperparameters” for optimal LLM performance as illustrated in <a href="#fig-why-llm-evals" class="quarto-xref">Figure&nbsp;1</a>. This is also why we should version our hyper-paramters eg. system prompts and LLM evaluation results together since a different configuration of LLM would result in different LLM responses.</p>
 <div id="fig-why-llm-evals" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-why-llm-evals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -264,13 +264,16 @@ div.csl-indent {
 <p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">flowchart LR
-  A(User enters symptoms) --&gt; B(Large Language Model application &lt;br&gt; gives medical diagnosis)
+  A(User enters symptoms) --&gt; B(AI application using LLM &lt;br&gt; for medical diagnosis)
   F(System Prompt v1) -.-&gt; B
   G(System Prompt v2) -.-&gt; B
   B --&gt; C1(Medical diagnosis using system prompt 1)
   B --&gt; C2(Medical diagnosis using system prompt 2)
-  C1 --&gt; D{LLM evaluation help answer &lt;br&gt;  which response is better?} 
-  C2 --&gt; D{LLM evaluation help answer &lt;br&gt; which response is better?} 
+  subgraph D[LLM Evaluations]
+            D1{Which response is better?}
+        end
+  C1 --&gt; D
+  C2 --&gt; D
   D --&gt; E(System Prompt 1 is better)
 
   style A color:purple
@@ -280,6 +283,7 @@ div.csl-indent {
   style C2 color:blue
   style G color:blue
   style E color:red
+  style D rx:10,ry:10,color:purple
 </pre>
 </div>
 <p></p></figure><p></p>
@@ -288,7 +292,7 @@ div.csl-indent {
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-why-llm-evals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: An over-simplified illustration for the importance of Large Language Model (LLM) evaluations in quantifying the performance of an LLM. LLM evaluations can also be leveraged as a data fly-wheel for iterativetly improving an LLM performance. For example, in this case the choice between system prompt 1 or 2 can be informed by LLM evaluations. Likewise, choice between which base models such as Mistral 7B or Llama 3 7B to use can also be made using LLM evaluations.
+Figure&nbsp;1: A simplified illustration for the importance of Large Language Model (LLM) evaluations in quantifying the performance of an LLM. LLM evaluations can also be leveraged as a data fly-wheel for iterativetly improving an LLM performance. For example, in this case the choice between system prompt 1 or 2 can be informed by LLM evaluations. Likewise, choice between which base models such as Mistral 7B or Llama 3 7B to use can also be made using LLM evaluations.
 </figcaption>
 </figure>
 </div>
@@ -296,7 +300,7 @@ Figure&nbsp;1: An over-simplified illustration for the importance of Large Langu
 <section id="llm-evaluations" class="level1">
 <h1>LLM Evaluations</h1>
 <p>LLM evaluations are an integral component for quantifying the performance of an LLM. As our dataset evolves, or our use-cases for LLM based product changes, we would need to be able to iterate on our evaluations to improve LLM performance.</p>
-<p>At the core of good, quality LLM evaluation is an understanding of data. As Hamel mentions <a href="https://hamel.dev/blog/posts/evals/">[blog]</a>, a sign of quality unit tests is when a LLM struggles to pass them for these failure modes become problems we can solve with techniques like fine-tuning later on. I would also like to emphasize that writing evaluations is an iterative process because of the cyclic dependency between understanding data and writing quality evaluations ♻️</p>
+<p>At the core of good, quality LLM evaluation is an understanding of data. As mentioned in <a href="https://hamel.dev/blog/posts/evals/">Hamel Hussain’s blog</a>, a sign of quality evaluations is when a LLM struggles to pass them for these failure modes become problems we can solve with techniques like fine-tuning later on. I would also like to emphasize that writing evaluations is an iterative process because of the cyclic dependency between understanding data and writing quality evaluations ♻️</p>
 <ul>
 <li>Understand data by reading data samples, finding patterns, edge cases in data etc.</li>
 <li>Once we have a greater understanding of our data, we can write better evals.</li>
@@ -323,8 +327,8 @@ Figure&nbsp;1: An over-simplified illustration for the importance of Large Langu
 </section>
 <section id="llm-as-a-judge" class="level2">
 <h2 class="anchored" data-anchor-id="llm-as-a-judge">LLM as a Judge</h2>
-<p>LLM as a judge is when we use a bigger, more powerful LLM to test the quality of an LLM response being used in an application. A natural question is why don’t we use the bigger, performant model in production to get quality responses: It is usually more expensive to fine-tune a bigger model, and also tends to be more expensive to deploy a bigger model in production.</p>
-<p>In the example covered in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a>, I will also cover LLM as a judge evaluation. The model I will use as a judge is OpenAI <code>gpt-4</code>. The LLM as a jugde evaluation can also be combined with human evaluations to ensure that LLM judgment is in-line with domain experts.</p>
+<p>LLM as a judge is when we use a bigger, more powerful LLM to test the quality of an LLM response being used in an application. A follow-up question could be why don’t we use the bigger, performant model in production to get quality responses: It is usually more expensive to fine-tune a bigger model, and also tends to be more expensive to deploy a bigger model in production.</p>
+<p>In the example covered in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a>, I will also cover LLM as a judge evaluation. The model I will use as a judge is OpenAI <code>gpt-4</code>. The LLM as a jugde evaluation can also be combined with human evaluations, explained next, to ensure that LLM judgment is in-line with domain experts.</p>
 </section>
 <section id="human-evaluation" class="level2">
 <h2 class="anchored" data-anchor-id="human-evaluation">Human Evaluation</h2>
@@ -341,7 +345,7 @@ Figure&nbsp;1: An over-simplified illustration for the importance of Large Langu
 <li>Scorers</li>
 </ul>
 <p>Once we have a dataset from our LLM that we want to evaluate, we need to determine the type of evaluations we want to run on it. A dataset from an LLM mean we have a user query/text given to LLM, and corresponding response from LLM recorded for each given prompt.</p>
-<p>The type of evalution we want to run on a data will determine the solver and scorer we want to use, and this is closely tied to the task our LLM application is performing. So for example, if our LLM application is used for sentiment classification, then we want to run a classification evaluation. If an LLM application is choosing an option from multiple choices, then we can perhaps use <code>multiple_choice()</code> solver with <code>choices()</code> scorer. Inspect offers a number of options to choose from for both scorer and solvers.</p>
+<p>The type of evalution we want to run on LLM data will determine the solver and scorer we want to use, and this is closely tied to the task our LLM application is performing. So for example, if our LLM application is used for sentiment classification, then we want to run a classification evaluation. If an LLM application is choosing an option from multiple choices, then we can perhaps use <code>multiple_choice()</code> solver with <code>choices()</code> scorer. Inspect offers a number of options to choose from for both scorer and solvers.</p>
 <p>Once a <code>Task</code> is run successfully, it generates a <code>Log</code> file that can be viewed natively in VSCode if Inspect extension is installed as shown in <a href="#fig-inspect-flowchart" class="quarto-xref">Figure&nbsp;2</a>. If Inspect extension is not installed, log file can also be viewed in a browser using <code>$ inspect view</code>.</p>
 <div id="fig-inspect-flowchart" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -393,11 +397,11 @@ Figure&nbsp;2: An illustration for Inspect object <code>Task</code> that combine
 </figcaption>
 </figure>
 </div>
-<p>The Inspect documentation covers standalone examples, such as one shown in <a href="#fig-standalone-theory-of-mind" class="quarto-xref">Figure&nbsp;3</a>, for different datasets, and corresponding solvers and scorers. In the following sections, I provide a brief summary of the Task components, though would recommend reading <a href="https://inspect.ai-safety-institute.org.uk/">Inspect documentation</a> for more details.</p>
+<p>The Inspect documentation includes multiple standalone examples as well as tutorials, such as one shown in <a href="#fig-standalone-theory-of-mind" class="quarto-xref">Figure&nbsp;3</a>, for different datasets, and corresponding solvers and scorers. In the following sections, I provide a brief summary of the Task components, though would recommend reading <a href="https://inspect.ai-safety-institute.org.uk/">Inspect documentation</a> for more details. Also, Inspect slides and code for <span class="citation" data-cites="mastering_llms_2024">(<a href="#ref-mastering_llms_2024" role="doc-biblioref">Maven 2024</a>)</span> course are also available on Github <a href="https://github.com/jjallaire/inspect-llm-workshop">here</a>.</p>
 <div id="fig-standalone-theory-of-mind" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-standalone-theory-of-mind-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="e5977724" class="cell" data-execution_count="1">
+<div id="138d3675" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># theory.py</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai <span class="im">import</span> Task, task</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai.dataset <span class="im">import</span> example_dataset</span>
@@ -428,11 +432,11 @@ Figure&nbsp;3: A complete, stand alone example from Inspect documentation that o
 </div>
 <section id="dataset" class="level2">
 <h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
-<p>Dataset is the data you want to apply your evaluations on. It should have at least two columns: user input that was sent to an LLM, and the response from the LLM. Inspect offers a first class support for loading csv files, and also natively supports laoding datasets from Hugging Face.</p>
+<p>Dataset is the data we want to apply our evaluations on. It should have at least two columns: user input that was sent to an LLM, and the response from the LLM. Inspect offers a first class support for loading csv files, and also natively supports laoding datasets from Hugging Face.</p>
 </section>
 <section id="solver" class="level2">
 <h2 class="anchored" data-anchor-id="solver">Solver</h2>
-<p>Solvers are functions that transform dataset inputs such as prompt generation, call an LLM for generation, and act further on LLM output such as self-critique. Solvers can also be composed together as layers as shown in <a href="#fig-standalone-theory-of-mind" class="quarto-xref">Figure&nbsp;3</a>, or can be a single layer with higher internal complexity. Some examples of solvers include:</p>
+<p>Solvers are functions that transform dataset inputs such as prompt generation, call an LLM for generation such as when using another LLM as a judge, and act further on LLM output such as self-critique. Solvers can also be composed together as layers as shown in <a href="#fig-standalone-theory-of-mind" class="quarto-xref">Figure&nbsp;3</a>, or can be a single layer with higher internal complexity. Some examples of solvers include:</p>
 <ul>
 <li>Providing system prompts</li>
 <li>Prompt engineering (e.g.&nbsp;chain of thought)</li>
@@ -442,7 +446,7 @@ Figure&nbsp;3: A complete, stand alone example from Inspect documentation that o
 </section>
 <section id="scorer" class="level2">
 <h2 class="anchored" data-anchor-id="scorer">Scorer</h2>
-<p>Scorers evaluates the output from solvers. Solvers may use text comparisons, model grading, or other custom schemes. In summary, scorers evaluate whether solvers were successful in finding the right output for the target defined in the dataset, and in what measure. Some examples of Scorers available in Inspect include:</p>
+<p>Scorers evaluates the output from solvers. Solvers may use text comparisons, model grading, or other custom schemes. In summary, scorers evaluate whether solvers were successful in finding the right output for the target defined in the dataset, and in what measure. Scorer then uses metrics to give a quantifiable score for the result of evaluation task such as <code>accuracy 0.8</code> means that 80% of the responses from LLM met the evaluation criterion. Some examples of Scorers available in Inspect include:</p>
 <ul>
 <li><p>Extracting a specific answer out of a model’s completion output using heuristics.</p></li>
 <li><p>Applying a text similarity algorithm to see if a model’s response is close to target.</p></li>
@@ -453,7 +457,7 @@ Figure&nbsp;3: A complete, stand alone example from Inspect documentation that o
 <p>Log files contain results of an evaluation output. Inspect has a VSCode extension that can be used to view log files seamlessly. <a href="#fig-log-file" class="quarto-xref">Figure&nbsp;4</a> shows a part of a log file generated by a validate task on a theory of mind dataset as outlined in <a href="#fig-standalone-theory-of-mind" class="quarto-xref">Figure&nbsp;3</a>. The log file in <a href="#fig-log-file" class="quarto-xref">Figure&nbsp;4</a> shows</p>
 <ul>
 <li>For each data instance a score as Correct (C) or Incorrect (I) is given by the scorer</li>
-<li>The overall accuracy on right top indicates the number of data samples that resulted in correct evaluations</li>
+<li>The overall accuracy on right top indicates the ratio of number of data samples that resulted in correct evaluations</li>
 </ul>
 <div id="fig-log-file" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -469,8 +473,8 @@ Figure&nbsp;4: An illustration for a log file generated for a “validate” tas
 </section>
 <section id="sec-example" class="level1">
 <h1>Example: Evaluating LLM Responses on Symptom to Disease Diagnosis</h1>
-<p>In this section, I will cover how I developed LLM evaluations for a hypothetical LLM application that is being used for disease diagnostics given some symptoms. The base LLM I am using is <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a>.</p>
-<p>The example is run locally on VSCode, and I have installed Inspect extension to view log files.</p>
+<p>In this section, I will cover how I developed LLM evaluations for a hypothetical LLM application that is being used for disease diagnostics given some symptoms. The base LLM I am using is <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a>. I will adapt <code>mistralai/Mistral-7B-Instruct-v0.3</code> for disease diagnostics using few-shot prompting. Though we will see later in the example when our evaluation results would indicate that for better responses we might need to explore RAG or perhaps fine-tune <code>mistralai/Mistral-7B-Instruct-v0.3</code>.</p>
+<p>The evaluations in the example are run locally on VSCode, and I have installed Inspect extension to view log files. Though I used Google Colab for getting <code>mistralai/Mistral-7B-Instruct-v0.3</code> responses on dataset that contains symptoms.</p>
 <section id="data" class="level2">
 <h2 class="anchored" data-anchor-id="data">Data</h2>
 <p>The dataset used for evaluating consists of 1200 instances where each sample has <code>text</code> that explains the symptoms and <code>label</code> that tells corresponding disease name. The dataset is made available by Mistral AI, and can be found on Github <span class="citation" data-cites="mistral2024">Mistral-AI (<a href="#ref-mistral2024" role="doc-biblioref">2024</a>)</span>. <a href="#tbl-sample-dataset" class="quarto-xref">Table&nbsp;1</a> has two entries from the dataset. The dataset contains symptoms for 24 diseases. A full list of disease names is included in <code>SYSTEM_PROMPT</code> in <a href="#fig-system-prompt" class="quarto-xref">Figure&nbsp;5</a>.</p>
@@ -505,16 +509,17 @@ Table&nbsp;1: Two data instances from symptom to disease dataset <span class="ci
 </div>
 </figure>
 </div>
+<p>A side note that when using an LLM as is, <code>mistralai/Mistral-7B-Instruct-v0.3</code> in this case, with few-shot prompting we do not need labels for data instances as such i.e.&nbsp;name of disease in this case. Though when fine-tuning we would need such a labelled dataset.</p>
 </section>
 <section id="model-responses" class="level2">
 <h2 class="anchored" data-anchor-id="model-responses">Model Responses</h2>
 <p>In this section, I will use <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a> to get diagnosis for each entry/symptom description in the dataset <a href="#tbl-sample-dataset" class="quarto-xref">Table&nbsp;1</a>.</p>
 <p>I am using <code>Mistral-7B-Instruct-v0.3</code> model because it is already fine-tuned to follow instructions. I also experimented a bit with Llama 3 7B though since it is not fine-tuned to follow instructions, the Llama responses comprised more of text generation than diagnosing a disease.</p>
-<p>For this example, I included particular instructions I wanted <code>Mistral-7B-Instruct-v0.3</code> to follow for medical disgnostics in <code>SYSTEM_PROMPT</code>. In short, the instructions included to respond with a disease name that is most likely causing the symptoms as entered by a user. The complete <code>SYSTEM_PROMPT</code> is shown in <a href="#fig-system-prompt" class="quarto-xref">Figure&nbsp;5</a>.</p>
+<p>For this example, I included particular instructions I wanted <code>Mistral-7B-Instruct-v0.3</code> to follow for medical disgnostics in <code>SYSTEM_PROMPT</code>. I also included an example response. In short, the instructions for LLM are to respond with a disease name that is most likely causing the symptoms as explained by a user in a prompt. The complete <code>SYSTEM_PROMPT</code> is shown in <a href="#fig-system-prompt" class="quarto-xref">Figure&nbsp;5</a>.</p>
 <div id="fig-system-prompt" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-system-prompt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="faf73854" class="cell" data-execution_count="2">
+<div id="5127ef06" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SYSTEM_PROMPT <span class="op">=</span> <span class="st">"""</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">You are an expert medical professional named Medical AI. </span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -568,7 +573,7 @@ Figure&nbsp;5: <code>SYSTEM_PROMPT</code> as used in the example to query <code>
 <div id="fig-code-block-mistral-inference" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-code-block-mistral-inference-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="9af233a2" class="cell" data-execution_count="3">
+<div id="afe6c6fd" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> huggingface_hub <span class="im">import</span> snapshot_download</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -649,7 +654,7 @@ Figure&nbsp;6: Code used for getting <a href="https://huggingface.co/mistralai/M
 <div id="fig-unit-evals-code" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-unit-evals-code-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="449f1e69" class="cell" data-execution_count="4">
+<div id="eb85ecd4" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TestSample:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data: Dict):</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.data <span class="op">=</span> data</span>
@@ -673,7 +678,7 @@ Figure&nbsp;6: Code used for getting <a href="https://huggingface.co/mistralai/M
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-unit-evals-code-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7: An excerpt that shows the unit evaluations being used to assert that response from LLM for diagnosis is non-empty, contains all strings, and contains one of the possible disease names. Further additions may also include for case insensitive tests.
+Figure&nbsp;7: An excerpt that shows the unit evaluations being used to assert that response from LLM for diagnosis is non-empty, contains all strings, and contains one of the possible disease names.
 </figcaption>
 </figure>
 </div>
@@ -688,7 +693,7 @@ Figure&nbsp;8: Unit evaluations run on <code>Mistral-7B-Instruct-v0.3</code> mod
 </figcaption>
 </figure>
 </div>
-<p>In <a href="#fig-unit-eval-failed-samples" class="quarto-xref">Figure&nbsp;9</a>, I have listed some responses that are failing the “disease name in response” test. A quick look tells that these responses did indeed have a disease name though failed the unit evaluations because the case didn’t match between model response and the name of the disease in <code>POSSIBLE_DISEASES</code>.</p>
+<p>In <a href="#fig-unit-eval-failed-samples" class="quarto-xref">Figure&nbsp;9</a>, I have listed some responses that are failing the “disease name in response” test. A quick look tells that these responses did indeed have a disease name though failed the unit evaluations because probably the case didn’t match between model response and the name of the disease in <code>POSSIBLE_DISEASES</code>.</p>
 <div id="fig-unit-eval-failed-samples" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-unit-eval-failed-samples-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -699,31 +704,14 @@ Figure&nbsp;8: Unit evaluations run on <code>Mistral-7B-Instruct-v0.3</code> mod
 11,"Psoriasis (for the first user input)
 Varicose Veins (for the second user input)
 (For the third user input, the symptoms provided are not specific to any of the listed diseases. It could be a sign of various conditions such as eczema, seborrheic"
-12,Psoriatic Arthritis (This condition is a combination of psoriasis and arthritis.)
-13,Jaundice (possibly associated with Hepatitis or other liver diseases)
-15,Allergy
-17,Cervical Spondylosis
-18,Jaundice (possibly due to Hepatitis or Gallstones)
-20,Common Cold or Bronchial Asthma (depending on the persistence and severity of symptoms)
-24,Peptic Ulcer Disease
-25,Peptic Ulcer Disease
-28,Flu (Influenza)
-33,Peptic Ulcer Disease
-40,Peptic Ulcer Disease
-42,Peptic Ulcer Disease
-43,Common Cold or Flu (Influenza)
-46,Flu (Influenza)
-50,Peptic Ulcer Disease
-51,Peptic Ulcer Disease
-52,Common Cold or Allergy (further evaluation is needed to differentiate)
-</code></pre>
+12,Psoriatic Arthritis (This condition is a combination of psoriasis and arthritis.)</code></pre>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-unit-eval-failed-samples-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9: A few of the responses that failed the “response contains a disease name” test. As we can see that in each reponse there does seem to be a disease name though our unit test is case sensitive which is generating a lot of false positives.
 </figcaption>
 </figure>
 </div>
-<p>For the next iteration of unit evaluations, I updated the test to be case insensitive and the new results are as shown in <a href="#fig-log-file-unit-test-case-insensitive-symptom2disease" class="quarto-xref">Figure&nbsp;10</a>. There is a significant improvement in “response contains a disease name” test. Some of the responses that still failed the test are listed in <a href="#fig-unit-eval-failed-samples-v2" class="quarto-xref">Figure&nbsp;11</a>.</p>
+<p>For the next iteration of unit evaluations, I updated the “response contains a disease name” test to be case insensitive and the new results are as shown in <a href="#fig-log-file-unit-test-case-insensitive-symptom2disease" class="quarto-xref">Figure&nbsp;10</a>. There is a ~33% improvement in “response contains a disease name” test results. Some of the responses that still failed the test are listed in <a href="#fig-unit-eval-failed-samples-v2" class="quarto-xref">Figure&nbsp;11</a>.</p>
 <div id="fig-log-file-unit-test-case-insensitive-symptom2disease" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-log-file-unit-test-case-insensitive-symptom2disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -749,22 +737,19 @@ Varicose Veins (for the second user input)
 20,Common Cold or Bronchial Asthma (depending on the persistence and severity of symptoms)
 28,Flu (Influenza)
 43,Common Cold or Flu (Influenza)
-46,Flu (Influenza)
-52,Common Cold or Allergy (further evaluation is needed to differentiate)
-61,"Lymphadenopathy (could be caused by various conditions, further investigation is needed)"
-74,Varicose Veins (again)
-</code></pre>
+46,Flu (Influenza)</code></pre>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-unit-eval-failed-samples-v2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;11: A few of the responses that failed the “response contains a disease name” test. As we can see that in each reponse there does seem to be a disease name though some samples do not seem to have same disease name as in <code>POSSIBLE_DISEASE</code> list such as <code>Flu</code>.
+Figure&nbsp;11: A few of the responses that failed the case-insensitive “response contains a disease name” test. As we can see that in each reponse there does seem to be a disease name though some samples do not seem to have same disease name as in <code>POSSIBLE_DISEASE</code> list such as <code>Flu</code>.
 </figcaption>
 </figure>
 </div>
-<p>In a furture iteration, we can perhaps add synonyms for common disease such as <code>Flu</code> is same as <code>Cold</code>, or <code>Common Cold</code>. Next, I will cover LLM as a Judge for evaluating <code>Mistral-7B-Instruct-v0.3</code> responses.</p>
+<p>In a furture iteration of the “response contains a disease name” test, we can perhaps add synonyms for common disease such as <code>Flu</code> is same as <code>Cold</code>, or <code>Common Cold</code>. We can also consider to revise <code>SYSTEM_PROMPT</code> to include multiple names for a given disease. Also, it is worthwhile to mention that despite stating in <code>SYSTEM_PROMPT</code> to only include a disease name as response there is still some additional text as seen in <a href="#fig-unit-eval-failed-samples-v2" class="quarto-xref">Figure&nbsp;11</a>. We can try aligning it further by adding more examples of expected response in <code>SYSTEM_PROMPT</code> though at some point a change in <code>SYSTEM_PROMPT</code> alone might not be sufficient, and this is when we would like to consider RAG or fine-tuning.</p>
+<p>Next, I will cover LLM as a Judge for evaluating <code>Mistral-7B-Instruct-v0.3</code> responses.</p>
 </section>
 <section id="llm-as-a-judge-1" class="level2">
 <h2 class="anchored" data-anchor-id="llm-as-a-judge-1">LLM as a Judge</h2>
-<p>For using an LLM as a judge, we can query another, more powerful LLM and “make it a judge” to assess the response quality. Inspect support most of the popular models such as OpenAI, Anthropic, Google, Mistral. For a complete list of supported models please read <a href="https://inspect.ai-safety-institute.org.uk/models.html">here</a>. Please note, we will need API key for the model we want to use as our judge.</p>
+<p>For using an LLM as a judge, we can query another, more powerful LLM and “make it a judge” to assess the response quality. Inspect support most of the popular models such as OpenAI, Anthropic, Google, Mistral. For a complete list of supported models please read <a href="https://inspect.ai-safety-institute.org.uk/models.html">here</a>. Please note, we will need an API key for the model we want to use as our judge.</p>
 <p>The critique prompt should include background and instructions for the judge LLM to use as a guide for its critique of <code>Mistral-7B-Instruct-v0.3</code> responses. <a href="#fig-critique-text" class="quarto-xref">Figure&nbsp;12</a> is an excerpt from critique prompt that I used in this example though please note the critique prompt is generated using an LLM and may not be representative of best practices in medical diagnostics.</p>
 <div id="fig-critique-text" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -820,12 +805,12 @@ PREDICTION: Peptic Ulcer Disease
 ---</code></pre>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-critique-text-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12: Some exceprt from critique prompt that I used for LLM as a judge. Disclaimer: I have used an LLM to generate example critiques which may not be representative of real medical diagnostics. This critique is to just show case how one LLM can be used as a judge to evaluate another LLMs responses.
+Figure&nbsp;12: Some exceprt from critique prompt that I used for LLM as a judge. Disclaimer: I have used an LLM to generate example critiques which may not be representative of best practises in medical diagnostics. This illustrative critique is to just show case how one LLM can be used as a judge to evaluate another LLMs responses.
 </figcaption>
 </figure>
 </div>
-<p>I used OpenAI <code>gpt4</code> model as a judge to critique <code>Mistral-7B-Instruct-v0.3</code> responses. <a href="#fig-log-file-llm-judge-symptom2disease" class="quarto-xref">Figure&nbsp;13</a> outlines critique obtained on one sample where <code>gpt4</code> and <code>Mistral-7B-Instruct-v0.3</code> responses are not in agreement.</p>
-<p>The critique from an LLM can also be used in tandem with subject experts, medical professionals in this case, to curate data for fine-tuning. Though this should be used with caution as it can help propagate human or LLM bias in fine-tuning dataset which in turn would result in skewed responses from a fine-tuned model.</p>
+<p>I used OpenAI <code>gpt4</code> model as a judge to critique 50 <code>Mistral-7B-Instruct-v0.3</code> responses to keep a tab on the cost involved. The critique evaluation resulted in an accuracy of 0.38 i.e.&nbsp;for ~40% samples LLM as a judge, <code>gpt4</code>, responses are in agreement with base LLM, <code>Mistral-7B-Instruct-v0.3</code>, responses. We can gain insight from the LLM as a judges critiques to learn where our base model,<code>Mistral-7B-Instruct-v0.3</code>, is struggling for example in <a href="#fig-log-file-llm-judge-symptom2disease" class="quarto-xref">Figure&nbsp;13</a> judge LLM thinks symptoms are more representative of Hypertension than Migraine, and also highlights that more context would help to conclude confidently between Migraine and Hypertension.</p>
+<p>By reading more evaluations of where the LLM as a judge agrees and differs with <code>Mistral-7B-Instruct-v0.3</code> it would help to gain insight on the strength and weaknesses for using <code>Mistral-7B-Instruct-v0.3</code>as a base LLM for medical diagnosis. By leveraging the feedback from LLM as a judge, the decision to whether base LLM responses contain sufficient context and depth for performing task at hand or whther we need to give more supporting documents via RAG or perhaps fine-tune can be made in a timely fashion. Though it is important to highlight that the judge is also another LLM and may hallucinate, or provide biased critique.</p>
 <div id="fig-log-file-llm-judge-symptom2disease" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-log-file-llm-judge-symptom2disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -836,6 +821,7 @@ Figure&nbsp;13: A sample showing critique for a medical diagnosis that judge LLM
 </figcaption>
 </figure>
 </div>
+<p>The critique from an LLM can also be used in tandem with subject experts, medical professionals in this case, to curate data for fine-tuning. Though again this should be used with caution as it can help propagate human or LLM bias in fine-tuning dataset which in turn would result in skewed responses from a fine-tuned model.</p>
 </section>
 </section>
 <section id="conclusion" class="level1">
