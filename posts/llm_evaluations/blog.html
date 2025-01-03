@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.39">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -91,7 +91,7 @@ div.csl-indent {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-659650fc26dc25888fc1474f317bb8ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -245,7 +245,7 @@ div.csl-indent {
 <ul>
 <li>A primer on LLM evaluations</li>
 <li>A primer on the tool Inspect <span class="citation" data-cites="inspect-2024">(<a href="#ref-inspect-2024" role="doc-biblioref">AI Safety Institute 2024</a>)</span></li>
-<li>An end to end example using Inspect to evaluate an LLMs’ responses for an AI driven medical diagnosis</li>
+<li>An end to end example using Inspect to evaluate an LLMs’ responses for an AI driven medical diagnosis. The code is available on <a href="https://github.com/mehrinkiani/llm-evaluations">Github</a></li>
 </ul>
 <p>Much of the content in this blog is my understanding of what the course covered though the example in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a> is not specific to the course. If you are already familiar with LLM evaluations, and the Inspect tool, please feel free to go to the example in <a href="#sec-example" class="quarto-xref">Section&nbsp;5</a> where I cover a step by step walk through for evaluating an LLMs’ responses for an AI driven medical diagnosis.</p>
 <p>In case you would like more information on LLM evaluations beyond this post, I would highly recommend reading the cited references, and also taking the course <span class="citation" data-cites="mastering_llms_2024">(<a href="#ref-mastering_llms_2024" role="doc-biblioref">Maven 2024</a>)</span>. Most of the content from the course is still available to watch freely on YouTube.</p>
@@ -401,7 +401,7 @@ Figure&nbsp;2: An illustration for Inspect object <code>Task</code> that combine
 <div id="fig-standalone-theory-of-mind" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-standalone-theory-of-mind-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="138d3675" class="cell" data-execution_count="1">
+<div id="88de7d77" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># theory.py</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai <span class="im">import</span> Task, task</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai.dataset <span class="im">import</span> example_dataset</span>
@@ -474,7 +474,7 @@ Figure&nbsp;4: An illustration for a log file generated for a “validate” tas
 <section id="sec-example" class="level1">
 <h1>Example: Evaluating LLM Responses on Symptom to Disease Diagnosis</h1>
 <p>In this section, I will cover how I developed LLM evaluations for a hypothetical LLM application that is being used for disease diagnostics given some symptoms. The base LLM I am using is <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a>. I will adapt <code>mistralai/Mistral-7B-Instruct-v0.3</code> for disease diagnostics using few-shot prompting. Though we will see later in the example when our evaluation results would indicate that for better responses we might need to explore RAG or perhaps fine-tune <code>mistralai/Mistral-7B-Instruct-v0.3</code>.</p>
-<p>The evaluations in the example are run locally on VSCode, and I have installed Inspect extension to view log files. Though I used Google Colab for getting <code>mistralai/Mistral-7B-Instruct-v0.3</code> responses on dataset that contains symptoms.</p>
+<p>The evaluations in the example are run locally on VSCode, and I have installed Inspect extension to view log files. Though I used Google Colab for getting <code>mistralai/Mistral-7B-Instruct-v0.3</code> responses on dataset that contains symptoms. The code is available on <a href="https://github.com/mehrinkiani/llm-evaluations">Github</a>.</p>
 <section id="data" class="level2">
 <h2 class="anchored" data-anchor-id="data">Data</h2>
 <p>The dataset used for evaluating consists of 1200 instances where each sample has <code>text</code> that explains the symptoms and <code>label</code> that tells corresponding disease name. The dataset is made available by Mistral AI, and can be found on Github <span class="citation" data-cites="mistral2024">Mistral-AI (<a href="#ref-mistral2024" role="doc-biblioref">2024</a>)</span>. <a href="#tbl-sample-dataset" class="quarto-xref">Table&nbsp;1</a> has two entries from the dataset. The dataset contains symptoms for 24 diseases. A full list of disease names is included in <code>SYSTEM_PROMPT</code> in <a href="#fig-system-prompt" class="quarto-xref">Figure&nbsp;5</a>.</p>
@@ -513,13 +513,13 @@ Table&nbsp;1: Two data instances from symptom to disease dataset <span class="ci
 </section>
 <section id="model-responses" class="level2">
 <h2 class="anchored" data-anchor-id="model-responses">Model Responses</h2>
-<p>In this section, I will use <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a> to get diagnosis for each entry/symptom description in the dataset <a href="#tbl-sample-dataset" class="quarto-xref">Table&nbsp;1</a>.</p>
+<p>In this section, I will use <a href="https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"><code>mistralai/Mistral-7B-Instruct-v0.3</code></a> to get diagnosis for each entry/symptom description in the dataset <a href="#tbl-sample-dataset" class="quarto-xref">Table&nbsp;1</a>. <code>Mistral-7B-Instruct-v0.3</code> is available on Hugging Face though the model is gated, and so we would need to agree to their terms to gain access.</p>
 <p>I am using <code>Mistral-7B-Instruct-v0.3</code> model because it is already fine-tuned to follow instructions. I also experimented a bit with Llama 3 7B though since it is not fine-tuned to follow instructions, the Llama responses comprised more of text generation than diagnosing a disease.</p>
 <p>For this example, I included particular instructions I wanted <code>Mistral-7B-Instruct-v0.3</code> to follow for medical disgnostics in <code>SYSTEM_PROMPT</code>. I also included an example response. In short, the instructions for LLM are to respond with a disease name that is most likely causing the symptoms as explained by a user in a prompt. The complete <code>SYSTEM_PROMPT</code> is shown in <a href="#fig-system-prompt" class="quarto-xref">Figure&nbsp;5</a>.</p>
 <div id="fig-system-prompt" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-system-prompt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="5127ef06" class="cell" data-execution_count="2">
+<div id="ef78fd77" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SYSTEM_PROMPT <span class="op">=</span> <span class="st">"""</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">You are an expert medical professional named Medical AI. </span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -573,7 +573,7 @@ Figure&nbsp;5: <code>SYSTEM_PROMPT</code> as used in the example to query <code>
 <div id="fig-code-block-mistral-inference" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-code-block-mistral-inference-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="afe6c6fd" class="cell" data-execution_count="3">
+<div id="ea9dfd53" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> huggingface_hub <span class="im">import</span> snapshot_download</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -654,7 +654,7 @@ Figure&nbsp;6: Code used for getting <a href="https://huggingface.co/mistralai/M
 <div id="fig-unit-evals-code" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-unit-evals-code-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="eb85ecd4" class="cell" data-execution_count="4">
+<div id="f238acd7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TestSample:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data: Dict):</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.data <span class="op">=</span> data</span>
