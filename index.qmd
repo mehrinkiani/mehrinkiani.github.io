@@ -1,5 +1,5 @@
 ---
-title: "Machine Learning Blog"
+title: "Neuromorphivity"
 listing:
   contents: posts
   sort: "date desc"
