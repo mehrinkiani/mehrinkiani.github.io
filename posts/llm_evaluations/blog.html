@@ -9,7 +9,7 @@
 <meta name="author" content="Mehrin Kiani">
 <meta name="dcterms.date" content="2024-12-20">
 
-<title>LLM Evaluations using Inspect – Mehrin Kiani’s Blog</title>
+<title>LLM Evaluations using Inspect – Neuromorphivity</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -94,7 +94,7 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-659650fc26dc25888fc1474f317bb8ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-c75bcb89907db7808f0349b764a1a524.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -139,7 +139,7 @@ div.csl-indent {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Mehrin Kiani’s Blog</span>
+    <span class="navbar-title">Neuromorphivity</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -401,7 +401,7 @@ Figure&nbsp;2: An illustration for Inspect object <code>Task</code> that combine
 <div id="fig-standalone-theory-of-mind" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-standalone-theory-of-mind-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="88de7d77" class="cell" data-execution_count="1">
+<div id="197469d9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># theory.py</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai <span class="im">import</span> Task, task</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> inspect_ai.dataset <span class="im">import</span> example_dataset</span>
@@ -519,7 +519,7 @@ Table&nbsp;1: Two data instances from symptom to disease dataset <span class="ci
 <div id="fig-system-prompt" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-system-prompt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="ef78fd77" class="cell" data-execution_count="2">
+<div id="3c644511" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SYSTEM_PROMPT <span class="op">=</span> <span class="st">"""</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">You are an expert medical professional named Medical AI. </span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -573,7 +573,7 @@ Figure&nbsp;5: <code>SYSTEM_PROMPT</code> as used in the example to query <code>
 <div id="fig-code-block-mistral-inference" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-code-block-mistral-inference-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="ea9dfd53" class="cell" data-execution_count="3">
+<div id="3d5d39c7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> huggingface_hub <span class="im">import</span> snapshot_download</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -654,7 +654,7 @@ Figure&nbsp;6: Code used for getting <a href="https://huggingface.co/mistralai/M
 <div id="fig-unit-evals-code" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-unit-evals-code-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div id="f238acd7" class="cell" data-execution_count="4">
+<div id="370a75e3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TestSample:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data: Dict):</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.data <span class="op">=</span> data</span>
@@ -744,7 +744,8 @@ Figure&nbsp;11: A few of the responses that failed the case-insensitive “respo
 </figcaption>
 </figure>
 </div>
-<p>In a furture iteration of the “response contains a disease name” test, we can perhaps add synonyms for common disease such as <code>Flu</code> is same as <code>Cold</code>, or <code>Common Cold</code>. We can also consider to revise <code>SYSTEM_PROMPT</code> to include multiple names for a given disease. Also, it is worthwhile to mention that despite stating in <code>SYSTEM_PROMPT</code> to only include a disease name as response there is still some additional text as seen in <a href="#fig-unit-eval-failed-samples-v2" class="quarto-xref">Figure&nbsp;11</a>. We can try aligning it further by adding more examples of expected response in <code>SYSTEM_PROMPT</code> though at some point a change in <code>SYSTEM_PROMPT</code> alone might not be sufficient, and this is when we would like to consider RAG or fine-tuning.</p>
+<p>In a furture iteration of the “response contains a disease name” test, we can perhaps add synonyms for common disease such as <code>Flu</code> is same as <code>Cold</code>, or <code>Common Cold</code>. We can also consider to revise <code>SYSTEM_PROMPT</code> to include multiple names for a given disease. Also, it is worthwhile to mention that despite stating in <code>SYSTEM_PROMPT</code> to only include a disease name as response there is still some additional text as seen in <a href="#fig-unit-eval-failed-samples-v2" class="quarto-xref">Figure&nbsp;11</a>. We can try aligning it further by adding more examples of expected response in <code>SYSTEM_PROMPT</code>.</p>
+<p>Looking at both <a href="#fig-unit-eval-failed-samples" class="quarto-xref">Figure&nbsp;9</a> and <a href="#fig-unit-eval-failed-samples-v2" class="quarto-xref">Figure&nbsp;11</a> we learnt key insights about LLM responses that the case did not always match, and also the LLM is responding with synonyms for common disease names resulting in failes unit tests. The insights we learnt from unit evaluations results, and possible next iterations would help to further align LLM response to our expected response. Though it is important to note that at some point a change in unit evaluations or <code>SYSTEM_PROMPT</code> alone might not be sufficient, and this would be a good time to consider other techniques such as RAG or fine-tuning LLM.</p>
 <p>Next, I will cover LLM as a Judge for evaluating <code>Mistral-7B-Instruct-v0.3</code> responses.</p>
 </section>
 <section id="llm-as-a-judge-1" class="level2">
